@@ -54,7 +54,19 @@ describe("GET /api/articles/:article_id returns correct article", () => {
       votes: 0,
     });
   });
-  test("returns 404 error if endpoint incorrectly inputted", async () => {
+  test("returns 404 error if article number has no article", async () => {
     const results = await request(app).get("/api/articles/30").expect(404);
+    expect(results.body).toEqual({
+      msg: "An article with provided article ID does not exist",
+    });
+  });
+  test("returns 404 error if article number is non-number", async () => {
+    const results = await request(app).get("/api/articles/cheese").expect(404);
+    expect(results.body).toEqual({
+      msg: "An article with provided article ID does not exist",
+    });
+  });
+  test("returns 404 error if endpoint incorrectly inputted", async () => {
+    const results = await request(app).get("/api/article/2").expect(404);
   });
 });
