@@ -1,8 +1,12 @@
 const express = require("express");
 
+const { returnTopics } = require("./controllers/controllers");
+
 const app = express();
 
 app.use(express.json());
+
+app.get("/api/topics", returnTopics);
 
 app.use((err, req, res, next) => {
   if (err.status) {
