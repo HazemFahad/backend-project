@@ -7,7 +7,7 @@ const testData = require("../db/data/test-data/index");
 beforeEach(() => seed(testData));
 afterAll(() => db.end());
 
-describe.only("GET /api/topics returns all topics", () => {
+describe("GET /api/topics returns all topics", () => {
   test("endpoint returns array of topics with both description and slug", async () => {
     const results = await request(app).get("/api/topics").expect(200);
     expect(results.body).toEqual([
@@ -27,5 +27,34 @@ describe.only("GET /api/topics returns all topics", () => {
   });
   test("returns 404 error if endpoint incorrectly inputted", async () => {
     const results = await request(app).get("/api/wrongEndpoint").expect(404);
+  });
+});
+describe("GET /api/articles/:article_id returns correct article", () => {
+  test("endpoint returns correct article", async () => {
+    const results = await request(app).get("/api/articles/10").expect(200);
+    expect(results.body).toEqual({
+      article_id: 10,
+      author: "rogersop",
+      body: "Who are we kidding, there is only one, and it's Mitch!",
+      created_at: "2020-05-14T04:15:00.000Z",
+      title: "Seven inspirational thought leaders from Manchester UK",
+      topic: "mitch",
+      votes: 0,
+    });
+  });
+  test("endpoint returns correct article", async () => {
+    const results = await request(app).get("/api/articles/3").expect(200);
+    expect(results.body).toEqual({
+      article_id: 3,
+      author: "icellusedkars",
+      body: "some gifs",
+      created_at: "2020-11-03T09:12:00.000Z",
+      title: "Eight pug gifs that remind me of mitch",
+      topic: "mitch",
+      votes: 0,
+    });
+  });
+  test("returns 404 error if endpoint incorrectly inputted", async () => {
+    const results = await request(app).get("/api/articles/30").expect(404);
   });
 });
