@@ -1,42 +1,32 @@
 const res = require("express/lib/response");
 const { getTopics, getArticle, updateVotes } = require("../models/models");
 
-exports.returnTopics = async (req, res, next) => {
+exports.getTopics = async (req, res, next) => {
   try {
-    const results = await getTopics();
-    res.send(results).status(200);
+    const topics = await getTopics();
+    res.status(200).send({ topics });
   } catch (err) {
     next(err);
   }
 };
 
-exports.returnArticle = async (req, res, next) => {
+exports.getArticleById = async (req, res, next) => {
   try {
     const articleID = req.params.article_id;
-    const results = await getArticle(articleID);
-    if (results != undefined) {
-      res.send(results).status(200);
-    } else
-      res
-        .status(404)
-        .send({ msg: "An article with provided article ID does not exist" });
+    const article = await getArticle(articleID);
+    res.status(200).send({ article }); ///do this for rest
   } catch (err) {
     next(err);
   }
 };
 
-exports.addVotesToArticle = async (req, res, next) => {
+exports.patchArticleById = async (req, res, next) => {
   try {
     const articleID = req.params.article_id;
-    const voteNum = Number(req.body.inc_votes);
-    const results1 = await getArticle(articleID);
-    if (results1 === undefined) {
-      res
-        .status(404)
-        .send({ msg: "An article with provided article ID does not exist" });
-    }
-    const results2 = await updateVotes(articleID, voteNum);
-    res.send(results2).status(200);
+    const voteNum = req.body.inc_votes;
+
+    const article = await updateVotes(articleID, voteNum);
+    res.status(200).send({ article }); ///do this for rest
   } catch (err) {
     next(err);
   }
