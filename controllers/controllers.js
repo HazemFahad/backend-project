@@ -19,7 +19,7 @@ exports.getArticleById = async (req, res, next) => {
   try {
     const articleID = req.params.article_id;
     const article = await getArticle(articleID);
-    res.status(200).send({ article }); ///do this for rest
+    res.status(200).send({ article });
   } catch (err) {
     next(err);
   }
