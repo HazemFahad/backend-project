@@ -1,18 +1,18 @@
 const db = require("../db/connection");
 
 exports.getTopics = async () => {
-  const results = await db.query("SELECT * FROM topics");
+  const results = await db.query("SELECT * FROM topics;");
   return results.rows;
 };
 
 exports.getArticle = async (articleID) => {
-  const queryString = `
+  const articleQuery = `
     SELECT * FROM articles 
     WHERE article_id = $1;
     `;
 
   const value = [articleID];
-  const result = await db.query(queryString, value);
+  const result = await db.query(articleQuery, value);
 
   if (result.rows.length === 0) {
     return Promise.reject({
@@ -20,6 +20,16 @@ exports.getArticle = async (articleID) => {
       msg: "An article with provided article ID does not exist",
     });
   }
+
+  const commentQuery = `
+  SELECT * FROM comments 
+  WHERE article_id = $1;
+  `;
+
+  const commentResult = await db.query(commentQuery, value);
+  const commentCount = commentResult.rows.length;
+
+  result.rows[0].comment_count = commentCount;
 
   return result.rows[0];
 };
@@ -47,7 +57,7 @@ exports.updateVotes = async (articleID, voteNum) => {
 
 exports.getAllUsers = async () => {
   const queryString = `
-  SELECT username FROM users
+  SELECT username FROM users;
    `;
 
   const result = await db.query(queryString);
