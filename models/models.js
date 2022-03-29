@@ -44,3 +44,13 @@ exports.updateVotes = async (articleID, voteNum) => {
 
   return result.rows[0];
 };
+
+exports.getAllUsers = async () => {
+  const queryString = `
+  SELECT username FROM users
+   `;
+
+  const result = await db.query(queryString);
+
+  return result.rows;
+};
