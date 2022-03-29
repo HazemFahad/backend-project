@@ -16,3 +16,16 @@ exports.getArticle = async (articleID) => {
   });
   return articleArr[0];
 };
+
+exports.updateVotes = async (articleID, voteNum) => {
+  articleID = Number(articleID);
+  const results = await db.query("SELECT * FROM articles");
+
+  const articleArr = results.rows.filter((article) => {
+    if (article.article_id === articleID) {
+      return article;
+    }
+  });
+  articleArr[0].votes += voteNum;
+  return articleArr[0];
+};
