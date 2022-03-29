@@ -6,26 +6,41 @@ exports.getTopics = async () => {
 };
 
 exports.getArticle = async (articleID) => {
-  articleID = Number(articleID);
-  const results = await db.query("SELECT * FROM articles");
+  const queryString = `
+    SELECT * FROM articles 
+    WHERE article_id = $1;
+    `;
 
-  const articleArr = results.rows.filter((article) => {
-    if (article.article_id === articleID) {
-      return article;
-    }
-  });
-  return articleArr[0];
+  const value = [articleID];
+  const result = await db.query(queryString, value);
+
+  if (result.rows.length === 0) {
+    return Promise.reject({
+      status: 404,
+      msg: "An article with provided article ID does not exist",
+    });
+  }
+
+  return result.rows[0];
 };
 
 exports.updateVotes = async (articleID, voteNum) => {
-  articleID = Number(articleID);
-  const results = await db.query("SELECT * FROM articles");
+  const queryString = `
+  UPDATE articles 
+  SET votes = votes + $1 
+  WHERE article_id = $2 
+  RETURNING *;
+  `;
 
-  const articleArr = results.rows.filter((article) => {
-    if (article.article_id === articleID) {
-      return article;
-    }
-  });
-  articleArr[0].votes += voteNum;
-  return articleArr[0];
+  const values = [voteNum, articleID];
+  const result = await db.query(queryString, values);
+
+  if (result.rows.length === 0) {
+    return Promise.reject({
+      status: 404,
+      msg: "An article with provided article ID does not exist",
+    });
+  }
+
+  return result.rows[0];
 };
