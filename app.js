@@ -1,27 +1,31 @@
 const express = require("express");
 
 const {
-  returnTopics,
-  returnArticle,
-  addVotesToArticle,
+  getTopics,
+  getArticleById,
+  patchArticleById,
 } = require("./controllers/controllers");
 
 const app = express();
 
 app.use(express.json());
 
-app.get("/api/topics", returnTopics);
+app.get("/api/topics", getTopics);
 
-app.get("/api/articles/:article_id", returnArticle);
+app.get("/api/articles/:article_id", getArticleById);
 
-app.patch("/api/articles/:article_id", addVotesToArticle);
+app.patch("/api/articles/:article_id", patchArticleById);
 
-app.get("*", function (req, res) {
+app.all("/*", function (req, res, next) {
   res.status(404).send({ msg: "Page not Found" });
 });
 
-app.patch("*", function (req, res) {
-  res.status(404).send({ msg: "Page not Found" });
+app.use((err, req, res, next) => {
+  if (err.code === "22P02") {
+    return res.status(400).send({ msg: "Bad Request" });
+  } else {
+    next(err);
+  }
 });
 
 app.use((err, req, res, next) => {
