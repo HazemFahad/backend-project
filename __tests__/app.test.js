@@ -46,6 +46,7 @@ describe("GET /api/articles/:article_id returns correct article", () => {
       article: {
         article_id: 10,
         author: "rogersop",
+        comment_count: 0,
         body: "Who are we kidding, there is only one, and it's Mitch!",
         created_at: "2020-05-14T04:15:00.000Z",
         title: "Seven inspirational thought leaders from Manchester UK",
@@ -150,5 +151,15 @@ describe("GET /api/users", () => {
     expect(results.body).toEqual({
       msg: "Page not Found",
     });
+  });
+});
+
+/* ***************GET ARTICLE WITH COMMENT COUNT****************/
+
+describe("GET /api/articles/:article_id returns correct article", () => {
+  test("endpoint returns correct article", async () => {
+    const results = await request(app).get("/api/articles/1").expect(200);
+    console.log(results.body);
+    expect(results.body.article.comment_count).toBe(11);
   });
 });
