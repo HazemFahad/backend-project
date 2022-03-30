@@ -74,3 +74,33 @@ exports.getAllUsers = async () => {
 
   return result.rows;
 };
+
+/* ***************GET COMMENTS FOR EACH ARTICLE BY ID****************/
+
+exports.fetchCommentsForArticle = async (articleID) => {
+  const value = [articleID];
+
+  const articleQuery = `
+  SELECT *
+  FROM articles 
+  WHERE article_id = $1
+  `;
+
+  const articleResult = await db.query(articleQuery, value);
+
+  if (articleResult.rows.length === 0) {
+    return Promise.reject({
+      status: 404,
+      msg: "An article with provided article ID does not exist",
+    });
+  }
+  const commentQuery = `
+    SELECT *
+    FROM comments 
+    WHERE article_id = $1
+    `;
+
+  const commentResult = await db.query(commentQuery, value);
+
+  return commentResult.rows;
+};
