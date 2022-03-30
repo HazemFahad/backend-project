@@ -1,7 +1,7 @@
 const res = require("express/lib/response");
 const {
   getTopics,
-  getArticle,
+  fetchArticles,
   updateVotes,
   getAllUsers,
 } = require("../models/models");
@@ -15,10 +15,10 @@ exports.getTopics = async (req, res, next) => {
   }
 };
 
-exports.getArticleById = async (req, res, next) => {
+exports.getArticles = async (req, res, next) => {
   try {
     const articleID = req.params.article_id;
-    const article = await getArticle(articleID);
+    const article = await fetchArticles(articleID);
     res.status(200).send({ article });
   } catch (err) {
     next(err);
