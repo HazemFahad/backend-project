@@ -185,3 +185,49 @@ describe("GET /api/articles returns all articles in descending order", () => {
     });
   });
 });
+
+/* ***************GET COMMENTS FOR EACH ARTICLE BY ID****************/
+
+describe("GET /api/articles/:article_id/comments returns all comments for given article", () => {
+  test("endpoint returns array of comments for given article", async () => {
+    const results = await request(app)
+      .get("/api/articles/3/comments")
+      .expect(200);
+    expect(results.body).toEqual({
+      comments: [
+        {
+          comment_id: 10,
+          body: "git push origin master",
+          article_id: 3,
+          author: "icellusedkars",
+          votes: 0,
+          created_at: "2020-06-20T07:24:00.000Z",
+        },
+        {
+          comment_id: 11,
+          body: "Ambidextrous marsupial",
+          article_id: 3,
+          author: "icellusedkars",
+          votes: 0,
+          created_at: "2020-09-19T23:10:00.000Z",
+        },
+      ],
+    });
+  });
+  test("returns empty comment array if there are no comments for existing article", async () => {
+    const results = await request(app)
+      .get("/api/articles/2/comments")
+      .expect(200);
+    expect(results.body).toEqual({
+      comments: [],
+    });
+  });
+  test("returns 404 error if article ID not found", async () => {
+    const results = await request(app)
+      .get("/api/articles/38/comments")
+      .expect(404);
+    expect(results.body).toEqual({
+      msg: "An article with provided article ID does not exist",
+    });
+  });
+});
