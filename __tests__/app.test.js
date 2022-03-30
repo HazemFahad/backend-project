@@ -37,7 +37,7 @@ describe("GET /api/topics returns all topics", () => {
   });
 });
 
-/* ***************GET ARTICLE****************/
+/* ***************GET ARTICLE BY ID****************/
 
 describe("GET /api/articles/:article_id returns correct article", () => {
   test("endpoint returns correct article", async () => {
@@ -154,12 +154,34 @@ describe("GET /api/users", () => {
   });
 });
 
-/* ***************GET ARTICLE WITH COMMENT COUNT****************/
+/* ***************GET ARTICLE BY ID WITH COMMENT COUNT****************/
 
 describe("GET /api/articles/:article_id returns correct article", () => {
   test("endpoint returns correct article", async () => {
     const results = await request(app).get("/api/articles/1").expect(200);
-    console.log(results.body);
     expect(results.body.article.comment_count).toBe(11);
+  });
+});
+
+/* ***************GET ARTICLE DESC DATE****************/
+
+describe("GET /api/articles returns all articles in descending order", () => {
+  test("endpoint returns array of articles in descending order", async () => {
+    const results = await request(app).get("/api/articles").expect(200);
+    expect(results.body.article).toBeSortedBy("created_at", {
+      descending: true,
+    });
+  });
+  test("endpoint returns array of articles with comment count", async () => {
+    const results = await request(app).get("/api/articles").expect(200);
+    expect(
+      results.body.article.map((article) => article.comment_count)
+    ).toEqual([2, 1, 0, 0, 2, 11, 2, 0, 0, 0, 0, 0]);
+  });
+  test("returns 404 error if endpoint incorrectly inputted", async () => {
+    const results = await request(app).get("/api/arrtcles").expect(404);
+    expect(results.body).toEqual({
+      msg: "Page not Found",
+    });
   });
 });
