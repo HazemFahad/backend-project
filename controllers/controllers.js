@@ -4,6 +4,7 @@ const {
   fetchArticles,
   updateVotes,
   getAllUsers,
+  fetchCommentsForArticle,
 } = require("../models/models");
 
 exports.getTopics = async (req, res, next) => {
@@ -41,6 +42,16 @@ exports.getUsernames = async (req, res, next) => {
   try {
     const users = await getAllUsers();
     res.status(200).send({ users });
+  } catch (err) {
+    next(err);
+  }
+};
+
+exports.getCommentsForArticle = async (req, res, next) => {
+  try {
+    const articleID = req.params.article_id;
+    const comments = await fetchCommentsForArticle(articleID);
+    res.status(200).send({ comments });
   } catch (err) {
     next(err);
   }
