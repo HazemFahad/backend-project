@@ -2,7 +2,7 @@ const express = require("express");
 
 const {
   getTopics,
-  getArticleById,
+  getArticles,
   patchArticleById,
   getUsernames,
 } = require("./controllers/controllers");
@@ -13,9 +13,11 @@ app.use(express.json());
 
 app.get("/api/topics", getTopics);
 
-app.get("/api/articles/:article_id", getArticleById);
+app.get("/api/articles/:article_id", getArticles);
 
 app.get("/api/users", getUsernames);
+
+app.get("/api/articles", getArticles);
 
 app.patch("/api/articles/:article_id", patchArticleById);
 
