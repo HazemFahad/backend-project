@@ -7,6 +7,7 @@ const {
   getUsernames,
   getCommentsForArticle,
   postCommentToArticle,
+  deleteComment,
 } = require("./controllers/controllers");
 
 const app = express();
@@ -26,6 +27,8 @@ app.get("/api/articles/:article_id/comments", getCommentsForArticle);
 app.patch("/api/articles/:article_id", patchArticleById);
 
 app.post("/api/articles/:article_id/comments", postCommentToArticle);
+
+app.delete("/api/comments/:comment_id", deleteComment);
 
 app.all("/*", function (req, res, next) {
   res.status(404).send({ msg: "Page not Found" });
