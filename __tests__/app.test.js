@@ -222,7 +222,7 @@ describe("GET /api/articles returns articles with correct queries applied ", () 
   });
   test("endpoint returns empty array if articles filtered by topic which has no articles", async () => {
     const results = await request(app)
-      .get("/api/articles?topic=cheese&sort_by=comment_count&order=asc")
+      .get("/api/articles?topic=paper&sort_by=comment_count&order=asc")
       .expect(200);
     expect(results.body).toEqual({
       article: [],
@@ -234,6 +234,14 @@ describe("GET /api/articles returns articles with correct queries applied ", () 
       .expect(400);
     expect(results.body).toEqual({
       msg: "Bad Request - Invalid order",
+    });
+  });
+  test("returns 404 error if topic does not exist", async () => {
+    const results = await request(app)
+      .get("/api/articles?topic=cheese")
+      .expect(404);
+    expect(results.body).toEqual({
+      msg: "Not Found - Topic Not Found",
     });
   });
 });
@@ -302,7 +310,7 @@ describe("GET /api/articles/:article_id/comments returns all comments for given 
       .get("/api/articles/38/comments")
       .expect(404);
     expect(results.body).toEqual({
-      msg: "An article with provided article ID does not exist",
+      msg: "A article with provided article_ID does not exist",
     });
   });
   test("returns 400 error if article number is non-number", async () => {
@@ -335,7 +343,7 @@ describe("POST /api/articles/:article_id/comments returns new comment added to c
       .send({ username: "Hazem", body: "NC 4 Life" })
       .expect(404);
     expect(results.body).toEqual({
-      msg: "An article with provided article ID does not exist",
+      msg: "A article with provided article_ID does not exist",
     });
   });
   test("returns 404 error if endpoint incorrectly inputted", async () => {
@@ -353,5 +361,19 @@ describe("POST /api/articles/:article_id/comments returns new comment added to c
       .send({ username: "Hazem", body: "NC 4 Life" })
       .expect(400);
     expect(results.body.msg).toBe("Bad Request");
+  });
+});
+
+/* ***************DELETE COMMENTS BY ID****************/
+
+describe("DELETE /api/comments/:comment_id deletes comment from table and returns no content", () => {
+  test("returns 204 & returns no content", async () => {
+    const results = await request(app).delete("/api/comments/4").expect(204);
+  });
+  test("returns 404 if invalid comment_id", async () => {
+    const results = await request(app).delete("/api/comments/400").expect(404);
+    expect(results.body.msg).toBe(
+      "A comment with provided comment_ID does not exist"
+    );
   });
 });
