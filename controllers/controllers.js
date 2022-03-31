@@ -5,6 +5,8 @@ const {
   updateVotes,
   getAllUsers,
   fetchCommentsForArticle,
+  addCommentToArticle,
+  checkArticleExists,
 } = require("../models/models");
 
 exports.getTopics = async (req, res, next) => {
@@ -50,8 +52,27 @@ exports.getUsernames = async (req, res, next) => {
 exports.getCommentsForArticle = async (req, res, next) => {
   try {
     const articleID = req.params.article_id;
+    const articleCheck = await checkArticleExists(articleID);
+
     const comments = await fetchCommentsForArticle(articleID);
     res.status(200).send({ comments });
+  } catch (err) {
+    next(err);
+  }
+};
+
+/* ***************POST COMMENTS FOR EACH ARTICLE BY ID****************/
+
+exports.postCommentToArticle = async (req, res, next) => {
+  try {
+    const articleID = req.params.article_id;
+    const username = req.body.username;
+    const body = req.body.body;
+
+    const articleCheck = await checkArticleExists(articleID);
+
+    const newComment = await addCommentToArticle(articleID, username, body);
+    res.status(201).send({ newComment });
   } catch (err) {
     next(err);
   }
