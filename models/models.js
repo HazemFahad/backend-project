@@ -3,15 +3,13 @@ const db = require("../db/connection");
 /* ***************CHECK ARTICLE EXISTS****************/
 
 exports.checkArticleExists = async (articleID) => {
-  const value = [articleID];
-
   const articleQuery = `
     SELECT *
     FROM articles 
     WHERE article_id = $1
     `;
 
-  const articleResult = await db.query(articleQuery, value);
+  const articleResult = await db.query(articleQuery, [articleID]);
 
   if (articleResult.rows.length === 0) {
     return Promise.reject({
@@ -99,15 +97,13 @@ exports.getAllUsers = async () => {
 /* ***************GET COMMENTS FOR EACH ARTICLE BY ID****************/
 
 exports.fetchCommentsForArticle = async (articleID) => {
-  const value = [articleID];
-
   const commentQuery = `
     SELECT *
     FROM comments 
     WHERE article_id = $1
     `;
 
-  const commentResult = await db.query(commentQuery, value);
+  const commentResult = await db.query(commentQuery, [articleID]);
 
   return commentResult.rows;
 };
@@ -115,10 +111,10 @@ exports.fetchCommentsForArticle = async (articleID) => {
 /* ***************POST COMMENTS FOR EACH ARTICLE BY ID****************/
 
 exports.addCommentToArticle = async (articleID, username, body) => {
-  const userValue = [username, username, "somephoto"];
+  const userValue = [username, username];
   const userUpdate = `  
-  INSERT INTO users (name, username, avatar_url) 
-  VALUES ($1, $2, $3);`;
+  INSERT INTO users (name, username) 
+  VALUES ($1, $2);`;
   const userResult = await db.query(userUpdate, userValue);
 
   const commentValue = [body, articleID, username, 0];

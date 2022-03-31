@@ -66,8 +66,7 @@ exports.getCommentsForArticle = async (req, res, next) => {
 exports.postCommentToArticle = async (req, res, next) => {
   try {
     const articleID = req.params.article_id;
-    const username = req.body.username;
-    const body = req.body.body;
+    const { body, username } = req.body;
 
     const articleCheck = await checkArticleExists(articleID);
 
