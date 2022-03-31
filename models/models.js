@@ -2,19 +2,22 @@ const db = require("../db/connection");
 
 /* ***************CHECK ARTICLE EXISTS****************/
 
-exports.checkArticleExists = async (articleID) => {
-  const articleQuery = `
+exports.checkSomethingExists = async (id, theSomething) => {
+  const query = `
     SELECT *
-    FROM articles 
-    WHERE article_id = $1
+    FROM ${theSomething} 
+    WHERE ${theSomething.slice(0, -1)}_id = $1
     `;
 
-  const articleResult = await db.query(articleQuery, [articleID]);
+  const articleResult = await db.query(query, [id]);
 
   if (articleResult.rows.length === 0) {
     return Promise.reject({
       status: 404,
-      msg: "An article with provided article ID does not exist",
+      msg: `A ${theSomething.slice(0, -1)} with provided ${theSomething.slice(
+        0,
+        -1
+      )}_ID does not exist`,
     });
   }
 };
@@ -32,7 +35,8 @@ exports.fetchArticles = async (
   articleID,
   sort_by = "created_at",
   order = "desc",
-  topic
+  topic,
+  allTopics
 ) => {
   const value = [];
 
@@ -74,6 +78,15 @@ exports.fetchArticles = async (
   }
 
   if (topic) {
+    const TopicSlugList = allTopics.map((topic) => topic.slug);
+
+    if (TopicSlugList.indexOf(topic) === -1) {
+      return Promise.reject({
+        status: 404,
+        msg: "Not Found - Topic Not Found",
+      });
+    }
+
     articleQuery += `WHERE articles.topic = $1`;
     value.push(topic);
   }
@@ -163,4 +176,15 @@ exports.addCommentToArticle = async (articleID, username, body) => {
   const commentResult = await db.query(commentUpdate, commentValue);
 
   return commentResult.rows[0];
+};
+
+/* ***************DELETE COMMENTS BY ID****************/
+
+exports.removeComment = async (commentID) => {
+  const deleteQuery = `
+  DELETE 
+  FROM comments 
+  WHERE comment_id = $1
+  `;
+  const deleteResult = await db.query(deleteQuery, [commentID]);
 };
