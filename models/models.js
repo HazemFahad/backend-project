@@ -28,8 +28,38 @@ exports.getTopics = async () => {
 
 /* ***************GET ARTICLE BY ID****************/
 
-exports.fetchArticles = async (articleID) => {
+exports.fetchArticles = async (
+  articleID,
+  sort_by = "created_at",
+  order = "desc",
+  topic
+) => {
   const value = [];
+
+  const validOrder = ["asc", "desc"];
+
+  if (validOrder.indexOf(order) === -1) {
+    return Promise.reject({
+      status: 400,
+      msg: "Bad Request - Invalid order",
+    });
+  }
+  const validSortBy = [
+    "title",
+    "topic",
+    "author",
+    "body",
+    "created_at",
+    "votes",
+    "article_id",
+    "comment_count",
+  ];
+  if (validSortBy.indexOf(sort_by) === -1) {
+    return Promise.reject({
+      status: 400,
+      msg: "Bad Request - Invalid Sort-By",
+    });
+  }
 
   let articleQuery = `
     SELECT articles.*, COUNT(comments.article_id) :: INT AS comment_count
@@ -43,11 +73,16 @@ exports.fetchArticles = async (articleID) => {
     value.push(articleID);
   }
 
-  articleQuery += "GROUP BY articles.article_id ORDER BY created_at DESC;";
+  if (topic) {
+    articleQuery += `WHERE articles.topic = $1`;
+    value.push(topic);
+  }
+
+  articleQuery += `GROUP BY articles.article_id ORDER BY ${sort_by} ${order};`;
 
   const result = await db.query(articleQuery, value);
 
-  if (result.rows.length === 0) {
+  if (!topic && result.rows.length === 0) {
     return Promise.reject({
       status: 404,
       msg: "An article with provided article ID does not exist",
@@ -56,6 +91,7 @@ exports.fetchArticles = async (articleID) => {
   if (articleID) {
     return result.rows[0];
   }
+
   return result.rows;
 };
 
