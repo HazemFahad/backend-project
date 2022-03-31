@@ -140,29 +140,6 @@ describe("PATCH /api/articles/:article_id ", () => {
   });
 });
 
-/* ***************GET USERS****************/
-
-describe("GET /api/users", () => {
-  test("endpoint returns array of topics with both description and slug", async () => {
-    const results = await request(app).get("/api/users").expect(200);
-    expect(results.body).toEqual({
-      users: [
-        { username: "butter_bridge" },
-        { username: "icellusedkars" },
-        { username: "rogersop" },
-        { username: "lurker" },
-      ],
-    });
-  });
-
-  test("returns 404 error if endpoint incorrectly inputted", async () => {
-    const results = await request(app).get("/api/usirs").expect(404);
-    expect(results.body).toEqual({
-      msg: "Page not Found",
-    });
-  });
-});
-
 /* ***************GET ARTICLE DESC DATE****************/
 
 describe("GET /api/articles returns all articles in descending order", () => {
@@ -180,6 +157,104 @@ describe("GET /api/articles returns all articles in descending order", () => {
   });
   test("returns 404 error if endpoint incorrectly inputted", async () => {
     const results = await request(app).get("/api/arrtcles").expect(404);
+    expect(results.body).toEqual({
+      msg: "Page not Found",
+    });
+  });
+});
+
+/* ***************GET /api/articles (queries)****************/
+
+describe("GET /api/articles returns articles with correct queries applied ", () => {
+  test("endpoint returns array of articles filtered by topic", async () => {
+    const results = await request(app)
+      .get("/api/articles?topic=mitch")
+      .expect(200);
+    expect(
+      results.body.article.map((article) => {
+        return article.topic;
+      })
+    ).toEqual([
+      "mitch",
+      "mitch",
+      "mitch",
+      "mitch",
+      "mitch",
+      "mitch",
+      "mitch",
+      "mitch",
+      "mitch",
+      "mitch",
+      "mitch",
+    ]);
+  });
+  test("endpoint returns array of articles filtered by topic and sorted by comment count with default desc order", async () => {
+    const results = await request(app)
+      .get("/api/articles?topic=mitch&sort_by=comment_count")
+      .expect(200);
+    expect(results.body.article).toBeSortedBy("comment_count", {
+      descending: true,
+    });
+  });
+  test("endpoint returns array of articles filtered by topic and sorted by comment count with requested ASC order", async () => {
+    const results = await request(app)
+      .get("/api/articles?topic=mitch&sort_by=comment_count&order=asc")
+      .expect(200);
+    expect(results.body.article).toBeSortedBy("comment_count", {
+      ascending: true,
+    });
+  });
+  test("endpoint returns array of articles sorted by articleID with requested ASC order - IE topic not required to work", async () => {
+    const results = await request(app)
+      .get("/api/articles?sort_by=article_id&order=asc")
+      .expect(200);
+    expect(results.body.article).toBeSortedBy("article_id", {
+      ascending: true,
+    });
+  });
+  test("returns 400 error if sort-by column does not exist", async () => {
+    const results = await request(app)
+      .get("/api/articles?sort_by=cheese&order=asc")
+      .expect(400);
+    expect(results.body).toEqual({
+      msg: "Bad Request - Invalid Sort-By",
+    });
+  });
+  test("endpoint returns empty array if articles filtered by topic which has no articles", async () => {
+    const results = await request(app)
+      .get("/api/articles?topic=cheese&sort_by=comment_count&order=asc")
+      .expect(200);
+    expect(results.body).toEqual({
+      article: [],
+    });
+  });
+  test("returns 400 error if provided invalid order", async () => {
+    const results = await request(app)
+      .get("/api/articles?topic=mitch&sort_by=comment_count&order=cheese")
+      .expect(400);
+    expect(results.body).toEqual({
+      msg: "Bad Request - Invalid order",
+    });
+  });
+});
+
+/* ***************GET USERS****************/
+
+describe("GET /api/users", () => {
+  test("endpoint returns array of topics with both description and slug", async () => {
+    const results = await request(app).get("/api/users").expect(200);
+    expect(results.body).toEqual({
+      users: [
+        { username: "butter_bridge" },
+        { username: "icellusedkars" },
+        { username: "rogersop" },
+        { username: "lurker" },
+      ],
+    });
+  });
+
+  test("returns 404 error if endpoint incorrectly inputted", async () => {
+    const results = await request(app).get("/api/usirs").expect(404);
     expect(results.body).toEqual({
       msg: "Page not Found",
     });
