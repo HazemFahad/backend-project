@@ -6,6 +6,7 @@ const {
   patchArticleById,
   getUsernames,
   getCommentsForArticle,
+  postCommentToArticle,
 } = require("./controllers/controllers");
 
 const app = express();
@@ -24,12 +25,15 @@ app.get("/api/articles/:article_id/comments", getCommentsForArticle);
 
 app.patch("/api/articles/:article_id", patchArticleById);
 
+app.post("/api/articles/:article_id/comments", postCommentToArticle);
+
 app.all("/*", function (req, res, next) {
   res.status(404).send({ msg: "Page not Found" });
 });
 
 app.use((err, req, res, next) => {
   if (err.code === "22P02") {
+    // console.log(err);
     return res.status(400).send({ msg: "Bad Request" });
   } else {
     next(err);
@@ -44,6 +48,8 @@ app.use((err, req, res, next) => {
   }
 });
 app.use((err, req, res, next) => {
+  console.log(err);
+
   res.status(500).send({ msg: "Internal server error" });
 });
 
