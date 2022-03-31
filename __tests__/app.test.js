@@ -73,6 +73,15 @@ describe("GET /api/articles/:article_id returns correct article", () => {
   });
 });
 
+/* ***************GET ARTICLE BY ID WITH COMMENT COUNT****************/
+
+describe("GET /api/articles/:article_id returns correct article with comment count", () => {
+  test("endpoint returns correct article with comment count", async () => {
+    const results = await request(app).get("/api/articles/1").expect(200);
+    expect(results.body.article.comment_count).toBe(11);
+  });
+});
+
 /* ***************PATCH ARTICLE****************/
 
 describe("PATCH /api/articles/:article_id ", () => {
@@ -154,15 +163,6 @@ describe("GET /api/users", () => {
   });
 });
 
-/* ***************GET ARTICLE BY ID WITH COMMENT COUNT****************/
-
-describe("GET /api/articles/:article_id returns correct article", () => {
-  test("endpoint returns correct article", async () => {
-    const results = await request(app).get("/api/articles/1").expect(200);
-    expect(results.body.article.comment_count).toBe(11);
-  });
-});
-
 /* ***************GET ARTICLE DESC DATE****************/
 
 describe("GET /api/articles returns all articles in descending order", () => {
@@ -229,5 +229,54 @@ describe("GET /api/articles/:article_id/comments returns all comments for given 
     expect(results.body).toEqual({
       msg: "An article with provided article ID does not exist",
     });
+  });
+  test("returns 400 error if article number is non-number", async () => {
+    const results = await request(app)
+      .get("/api/articles/cheese/comments")
+      .expect(400);
+    expect(results.body.msg).toBe("Bad Request");
+  });
+});
+
+/* ***************POST COMMENTS FOR EACH ARTICLE BY ID****************/
+
+describe("POST /api/articles/:article_id/comments returns new comment added to comment table", () => {
+  test("returns new comment added to comment table", async () => {
+    const results = await request(app)
+      .post("/api/articles/2/comments")
+      .expect(201)
+      .send({ username: "Hazem", body: "NC 4 Life" });
+
+    expect(results.body.newComment.author).toBe("Hazem");
+    expect(results.body.newComment.body).toBe("NC 4 Life");
+    expect(results.body.newComment.article_id).toBe(2);
+    expect(results.body.newComment.comment_id).toBe(19);
+    expect(results.body.newComment.votes).toBe(0);
+  });
+
+  test("returns 404 error if article ID not found", async () => {
+    const results = await request(app)
+      .post("/api/articles/88/comments")
+      .send({ username: "Hazem", body: "NC 4 Life" })
+      .expect(404);
+    expect(results.body).toEqual({
+      msg: "An article with provided article ID does not exist",
+    });
+  });
+  test("returns 404 error if endpoint incorrectly inputted", async () => {
+    const results = await request(app)
+      .post("/api/articles/88/commments")
+      .send({ username: "Hazem", body: "NC 4 Life" })
+      .expect(404);
+    expect(results.body).toEqual({
+      msg: "Page not Found",
+    });
+  });
+  test("returns 400 error if article number is non-number", async () => {
+    const results = await request(app)
+      .post("/api/articles/cheese/comments")
+      .send({ username: "Hazem", body: "NC 4 Life" })
+      .expect(400);
+    expect(results.body.msg).toBe("Bad Request");
   });
 });
