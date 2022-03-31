@@ -37,7 +37,7 @@ describe("GET /api/topics returns all topics", () => {
   });
 });
 
-/* ***************GET ARTICLE****************/
+/* ***************GET ARTICLE BY ID****************/
 
 describe("GET /api/articles/:article_id returns correct article", () => {
   test("endpoint returns correct article", async () => {
@@ -46,6 +46,7 @@ describe("GET /api/articles/:article_id returns correct article", () => {
       article: {
         article_id: 10,
         author: "rogersop",
+        comment_count: 0,
         body: "Who are we kidding, there is only one, and it's Mitch!",
         created_at: "2020-05-14T04:15:00.000Z",
         title: "Seven inspirational thought leaders from Manchester UK",
@@ -149,6 +150,84 @@ describe("GET /api/users", () => {
     const results = await request(app).get("/api/usirs").expect(404);
     expect(results.body).toEqual({
       msg: "Page not Found",
+    });
+  });
+});
+
+/* ***************GET ARTICLE BY ID WITH COMMENT COUNT****************/
+
+describe("GET /api/articles/:article_id returns correct article", () => {
+  test("endpoint returns correct article", async () => {
+    const results = await request(app).get("/api/articles/1").expect(200);
+    expect(results.body.article.comment_count).toBe(11);
+  });
+});
+
+/* ***************GET ARTICLE DESC DATE****************/
+
+describe("GET /api/articles returns all articles in descending order", () => {
+  test("endpoint returns array of articles in descending order", async () => {
+    const results = await request(app).get("/api/articles").expect(200);
+    expect(results.body.article).toBeSortedBy("created_at", {
+      descending: true,
+    });
+  });
+  test("endpoint returns array of articles with comment count", async () => {
+    const results = await request(app).get("/api/articles").expect(200);
+    expect(
+      results.body.article.map((article) => article.comment_count)
+    ).toEqual([2, 1, 0, 0, 2, 11, 2, 0, 0, 0, 0, 0]);
+  });
+  test("returns 404 error if endpoint incorrectly inputted", async () => {
+    const results = await request(app).get("/api/arrtcles").expect(404);
+    expect(results.body).toEqual({
+      msg: "Page not Found",
+    });
+  });
+});
+
+/* ***************GET COMMENTS FOR EACH ARTICLE BY ID****************/
+
+describe("GET /api/articles/:article_id/comments returns all comments for given article", () => {
+  test("endpoint returns array of comments for given article", async () => {
+    const results = await request(app)
+      .get("/api/articles/3/comments")
+      .expect(200);
+    expect(results.body).toEqual({
+      comments: [
+        {
+          comment_id: 10,
+          body: "git push origin master",
+          article_id: 3,
+          author: "icellusedkars",
+          votes: 0,
+          created_at: "2020-06-20T07:24:00.000Z",
+        },
+        {
+          comment_id: 11,
+          body: "Ambidextrous marsupial",
+          article_id: 3,
+          author: "icellusedkars",
+          votes: 0,
+          created_at: "2020-09-19T23:10:00.000Z",
+        },
+      ],
+    });
+  });
+  test("returns empty comment array if there are no comments for existing article", async () => {
+    const results = await request(app)
+      .get("/api/articles/2/comments")
+      .expect(200);
+    expect(results.body).toEqual({
+      comments: [],
+    });
+  });
+  test("returns 404 error if article ID not found", async () => {
+    const results = await request(app)
+      .get("/api/articles/38/comments")
+      .expect(404);
+    expect(results.body).toEqual({
+      msg: "An article with provided article ID does not exist",
     });
   });
 });

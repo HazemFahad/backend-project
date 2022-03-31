@@ -1,18 +1,32 @@
 const db = require("../db/connection");
 
+/* ***************GET TOPICS****************/
+
 exports.getTopics = async () => {
-  const results = await db.query("SELECT * FROM topics");
+  const results = await db.query("SELECT * FROM topics;");
   return results.rows;
 };
 
-exports.getArticle = async (articleID) => {
-  const queryString = `
-    SELECT * FROM articles 
-    WHERE article_id = $1;
+/* ***************GET ARTICLE BY ID****************/
+
+exports.fetchArticles = async (articleID) => {
+  const value = [];
+
+  let articleQuery = `
+    SELECT articles.*, COUNT(comments.article_id) :: INT AS comment_count
+    FROM articles 
+    LEFT JOIN comments ON articles.article_id = comments.article_id
     `;
 
-  const value = [articleID];
-  const result = await db.query(queryString, value);
+  if (articleID) {
+    articleQuery += `WHERE articles.article_id = $1`;
+
+    value.push(articleID);
+  }
+
+  articleQuery += "GROUP BY articles.article_id ORDER BY created_at DESC;";
+
+  const result = await db.query(articleQuery, value);
 
   if (result.rows.length === 0) {
     return Promise.reject({
@@ -20,9 +34,13 @@ exports.getArticle = async (articleID) => {
       msg: "An article with provided article ID does not exist",
     });
   }
-
-  return result.rows[0];
+  if (articleID) {
+    return result.rows[0];
+  }
+  return result.rows;
 };
+
+/* ***************PATCH ARTICLE****************/
 
 exports.updateVotes = async (articleID, voteNum) => {
   const queryString = `
@@ -45,12 +63,44 @@ exports.updateVotes = async (articleID, voteNum) => {
   return result.rows[0];
 };
 
+/* ***************GET USERS****************/
+
 exports.getAllUsers = async () => {
   const queryString = `
-  SELECT username FROM users
+  SELECT username FROM users;
    `;
 
   const result = await db.query(queryString);
 
   return result.rows;
+};
+
+/* ***************GET COMMENTS FOR EACH ARTICLE BY ID****************/
+
+exports.fetchCommentsForArticle = async (articleID) => {
+  const value = [articleID];
+
+  const articleQuery = `
+  SELECT *
+  FROM articles 
+  WHERE article_id = $1
+  `;
+
+  const articleResult = await db.query(articleQuery, value);
+
+  if (articleResult.rows.length === 0) {
+    return Promise.reject({
+      status: 404,
+      msg: "An article with provided article ID does not exist",
+    });
+  }
+  const commentQuery = `
+    SELECT *
+    FROM comments 
+    WHERE article_id = $1
+    `;
+
+  const commentResult = await db.query(commentQuery, value);
+
+  return commentResult.rows;
 };
