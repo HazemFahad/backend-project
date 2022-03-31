@@ -1,5 +1,24 @@
 const db = require("../db/connection");
 
+/* ***************CHECK ARTICLE EXISTS****************/
+
+exports.checkArticleExists = async (articleID) => {
+  const articleQuery = `
+    SELECT *
+    FROM articles 
+    WHERE article_id = $1
+    `;
+
+  const articleResult = await db.query(articleQuery, [articleID]);
+
+  if (articleResult.rows.length === 0) {
+    return Promise.reject({
+      status: 404,
+      msg: "An article with provided article ID does not exist",
+    });
+  }
+};
+
 /* ***************GET TOPICS****************/
 
 exports.getTopics = async () => {
@@ -78,29 +97,34 @@ exports.getAllUsers = async () => {
 /* ***************GET COMMENTS FOR EACH ARTICLE BY ID****************/
 
 exports.fetchCommentsForArticle = async (articleID) => {
-  const value = [articleID];
-
-  const articleQuery = `
-  SELECT *
-  FROM articles 
-  WHERE article_id = $1
-  `;
-
-  const articleResult = await db.query(articleQuery, value);
-
-  if (articleResult.rows.length === 0) {
-    return Promise.reject({
-      status: 404,
-      msg: "An article with provided article ID does not exist",
-    });
-  }
   const commentQuery = `
     SELECT *
     FROM comments 
     WHERE article_id = $1
     `;
 
-  const commentResult = await db.query(commentQuery, value);
+  const commentResult = await db.query(commentQuery, [articleID]);
 
   return commentResult.rows;
+};
+
+/* ***************POST COMMENTS FOR EACH ARTICLE BY ID****************/
+
+exports.addCommentToArticle = async (articleID, username, body) => {
+  const userValue = [username, username];
+  const userUpdate = `  
+  INSERT INTO users (name, username) 
+  VALUES ($1, $2);`;
+  const userResult = await db.query(userUpdate, userValue);
+
+  const commentValue = [body, articleID, username, 0];
+  const commentUpdate = `
+  INSERT INTO comments (body, article_id, author, votes) 
+  VALUES ($1, $2, $3, $4)
+  RETURNING *;
+  `;
+
+  const commentResult = await db.query(commentUpdate, commentValue);
+
+  return commentResult.rows[0];
 };
