@@ -1,5 +1,7 @@
 const express = require("express");
 
+// const fs = require("fs/promises");
+
 const {
   getTopics,
   getArticles,
@@ -13,6 +15,8 @@ const {
 const app = express();
 
 app.use(express.json());
+
+app.get("/api");
 
 app.get("/api/topics", getTopics);
 
