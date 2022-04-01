@@ -2,22 +2,19 @@ const db = require("../db/connection");
 
 /* ***************CHECK ARTICLE EXISTS****************/
 
-exports.checkSomethingExists = async (id, theSomething) => {
+exports.checkSomethingExists = async (id, parent, child) => {
   const query = `
     SELECT *
-    FROM ${theSomething} 
-    WHERE ${theSomething.slice(0, -1)}_id = $1
+    FROM ${parent} 
+    WHERE ${child} = $1
     `;
 
-  const articleResult = await db.query(query, [id]);
+  const result = await db.query(query, [id]);
 
-  if (articleResult.rows.length === 0) {
+  if (result.rows.length === 0) {
     return Promise.reject({
       status: 404,
-      msg: `A ${theSomething.slice(0, -1)} with provided ${theSomething.slice(
-        0,
-        -1
-      )}_ID does not exist`,
+      msg: `A ${child} with provided ID does not exist`,
     });
   }
 };
@@ -141,6 +138,19 @@ exports.getAllUsers = async () => {
   const result = await db.query(queryString);
 
   return result.rows;
+};
+
+/* ***************GET USERS BY USERNAME****************/
+
+exports.fetchUsersByUsername = async (username) => {
+  const queryString = `
+  SELECT * FROM users
+  WHERE username = $1
+   `;
+
+  const result = await db.query(queryString, [username]);
+
+  return result.rows[0];
 };
 
 /* ***************GET COMMENTS FOR EACH ARTICLE BY ID****************/
