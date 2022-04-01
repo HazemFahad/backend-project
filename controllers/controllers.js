@@ -10,7 +10,10 @@ const {
   checkSomethingExists,
   removeComment,
   fetchUsersByUsername,
+  editComment,
 } = require("../models/models");
+
+//////////////////////////// TOPICS ////////////////////////////
 
 /* ***************GET TOPICS****************/
 
@@ -22,6 +25,8 @@ exports.getTopics = async (req, res, next) => {
     next(err);
   }
 };
+
+//////////////////////////// ARTICLE ////////////////////////////
 
 /* ***************GET ARTICLE ****************/
 
@@ -59,6 +64,8 @@ exports.patchArticleById = async (req, res, next) => {
   }
 };
 
+//////////////////////////// USERS ////////////////////////////
+
 /* ***************GET USERS****************/
 
 exports.getUsernames = async (req, res, next) => {
@@ -82,6 +89,8 @@ exports.getUsersByUsername = async (req, res, next) => {
     next(err);
   }
 };
+
+//////////////////////////// COMMENTS ////////////////////////////
 
 /* ***************GET COMMENTS FOR EACH ARTICLE BY ID****************/
 
@@ -137,6 +146,28 @@ exports.deleteComment = async (req, res, next) => {
     next(err);
   }
 };
+
+/* ***************PATCH COMMENTS BY ID****************/
+
+exports.patchComment = async (req, res, next) => {
+  try {
+    const { comment_id } = req.params;
+    const { inc_votes } = req.body;
+
+    const commentCheck = await checkSomethingExists(
+      comment_id,
+      "comments",
+      "comment_id"
+    );
+
+    const updatedComment = await editComment(comment_id, inc_votes);
+    res.status(200).send({ updatedComment });
+  } catch (err) {
+    next(err);
+  }
+};
+
+//////////////////////////// JSON ENDPOINTS ////////////////////////////
 
 /* ***************GET API RETURNS ENDPOINTS ****************/
 
