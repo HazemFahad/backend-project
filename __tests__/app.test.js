@@ -8,6 +8,8 @@ const fs = require("fs/promises");
 beforeEach(() => seed(testData));
 afterAll(() => db.end());
 
+//////////////////////////// TOPICS ////////////////////////////
+
 /* ***************GET TOPICS****************/
 
 describe("GET /api/topics returns all topics", () => {
@@ -37,6 +39,8 @@ describe("GET /api/topics returns all topics", () => {
     });
   });
 });
+
+//////////////////////////// ARTICLE ////////////////////////////
 
 /* ***************GET ARTICLE BY ID****************/
 
@@ -247,6 +251,8 @@ describe("GET /api/articles returns articles with correct queries applied ", () 
   });
 });
 
+//////////////////////////// USERS ////////////////////////////
+
 /* ***************GET USERS****************/
 
 describe("GET /api/users", () => {
@@ -304,6 +310,8 @@ describe("GET /api/users", () => {
     });
   });
 });
+
+//////////////////////////// COMMENTS ////////////////////////////
 
 /* ***************GET COMMENTS FOR EACH ARTICLE BY ID****************/
 
@@ -413,6 +421,45 @@ describe("DELETE /api/comments/:comment_id deletes comment from table and return
     );
   });
 });
+
+/* ***************PATCH COMMENTS BY ID****************/
+
+describe("PATCH /api/comments/:comment_id updates votes on given comment and returns updated comment", () => {
+  test("endpoint updates votes on given comment and returns updated comment", async () => {
+    const results = await request(app)
+      .patch("/api/comments/3")
+      .send({ inc_votes: 2 })
+      .expect(200);
+    expect(results.body).toEqual({
+      updatedComment: {
+        comment_id: 3,
+        body: "Replacing the quiet elegance of the dark suit and tie with the casual indifference of these muted earth tones is a form of fashion suicide, but, uh, call me crazy — onyou it works.",
+        article_id: 1,
+        author: "icellusedkars",
+        votes: 102,
+        created_at: "2020-03-01T01:13:00.000Z",
+      },
+    });
+  });
+  test("returns 404 error if comment ID not found", async () => {
+    const results = await request(app)
+      .patch("/api/comments/300")
+      .send({ inc_votes: 1 })
+      .expect(404);
+    expect(results.body).toEqual({
+      msg: "A comment_id with provided ID does not exist",
+    });
+  });
+  test("returns 400 error if article number is non-number", async () => {
+    const results = await request(app)
+      .patch("/api/comments/cheese")
+      .send({ inc_votes: 1 })
+      .expect(400);
+    expect(results.body.msg).toBe("Bad Request");
+  });
+});
+
+//////////////////////////// JSON ENDPOINTS ////////////////////////////
 
 /* ***************GET API RETURNS ENDPOINTS ****************/
 
