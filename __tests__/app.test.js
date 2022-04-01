@@ -270,6 +270,41 @@ describe("GET /api/users", () => {
   });
 });
 
+/* ***************GET USERS BY USERNAME****************/
+
+describe("GET /api/users", () => {
+  test("endpoint returns array of topics with both description and slug", async () => {
+    const results = await request(app)
+      .get("/api/users/icellusedkars")
+      .expect(200);
+    expect(results.body).toEqual({
+      user: {
+        username: "icellusedkars",
+        name: "sam",
+        avatar_url:
+          "https://avatars2.githubusercontent.com/u/24604688?s=460&v=4",
+      },
+    });
+  });
+
+  test("returns 404 error if username does not exist", async () => {
+    const results = await request(app)
+      .get("/api/users/cheesemuffin")
+      .expect(404);
+    expect(results.body).toEqual({
+      msg: "A username with provided ID does not exist",
+    });
+  });
+  test("returns 404 error if endpoint incorrectly inputted", async () => {
+    const results = await request(app)
+      .get("/api/usirs/icellusedkars")
+      .expect(404);
+    expect(results.body).toEqual({
+      msg: "Page not Found",
+    });
+  });
+});
+
 /* ***************GET COMMENTS FOR EACH ARTICLE BY ID****************/
 
 describe("GET /api/articles/:article_id/comments returns all comments for given article", () => {
@@ -311,7 +346,7 @@ describe("GET /api/articles/:article_id/comments returns all comments for given 
       .get("/api/articles/38/comments")
       .expect(404);
     expect(results.body).toEqual({
-      msg: "A article with provided article_ID does not exist",
+      msg: "A article_id with provided ID does not exist",
     });
   });
   test("returns 400 error if article number is non-number", async () => {
@@ -344,7 +379,7 @@ describe("POST /api/articles/:article_id/comments returns new comment added to c
       .send({ username: "Hazem", body: "NC 4 Life" })
       .expect(404);
     expect(results.body).toEqual({
-      msg: "A article with provided article_ID does not exist",
+      msg: "A article_id with provided ID does not exist",
     });
   });
   test("returns 404 error if endpoint incorrectly inputted", async () => {
@@ -374,7 +409,7 @@ describe("DELETE /api/comments/:comment_id deletes comment from table and return
   test("returns 404 if invalid comment_id", async () => {
     const results = await request(app).delete("/api/comments/400").expect(404);
     expect(results.body.msg).toBe(
-      "A comment with provided comment_ID does not exist"
+      "A comment_id with provided ID does not exist"
     );
   });
 });

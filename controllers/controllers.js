@@ -9,7 +9,10 @@ const {
   addCommentToArticle,
   checkSomethingExists,
   removeComment,
+  fetchUsersByUsername,
 } = require("../models/models");
+
+/* ***************GET TOPICS****************/
 
 exports.getTopics = async (req, res, next) => {
   try {
@@ -19,6 +22,8 @@ exports.getTopics = async (req, res, next) => {
     next(err);
   }
 };
+
+/* ***************GET ARTICLE ****************/
 
 exports.getArticles = async (req, res, next) => {
   try {
@@ -40,6 +45,8 @@ exports.getArticles = async (req, res, next) => {
   }
 };
 
+/* ***************PATCH ARTICLE****************/
+
 exports.patchArticleById = async (req, res, next) => {
   try {
     const articleID = req.params.article_id;
@@ -52,6 +59,8 @@ exports.patchArticleById = async (req, res, next) => {
   }
 };
 
+/* ***************GET USERS****************/
+
 exports.getUsernames = async (req, res, next) => {
   try {
     const users = await getAllUsers();
@@ -61,10 +70,29 @@ exports.getUsernames = async (req, res, next) => {
   }
 };
 
+/* ***************GET USERNAME BY USERNAME****************/
+
+exports.getUsersByUsername = async (req, res, next) => {
+  try {
+    const { username } = req.params;
+    const userCheck = await checkSomethingExists(username, "users", "username");
+    const user = await fetchUsersByUsername(username);
+    res.status(200).send({ user });
+  } catch (err) {
+    next(err);
+  }
+};
+
+/* ***************GET COMMENTS FOR EACH ARTICLE BY ID****************/
+
 exports.getCommentsForArticle = async (req, res, next) => {
   try {
     const articleID = req.params.article_id;
-    const articleCheck = await checkSomethingExists(articleID, "articles");
+    const articleCheck = await checkSomethingExists(
+      articleID,
+      "articles",
+      "article_id"
+    );
 
     const comments = await fetchCommentsForArticle(articleID);
     res.status(200).send({ comments });
@@ -80,7 +108,11 @@ exports.postCommentToArticle = async (req, res, next) => {
     const articleID = req.params.article_id;
     const { body, username } = req.body;
 
-    const articleCheck = await checkSomethingExists(articleID, "articles");
+    const articleCheck = await checkSomethingExists(
+      articleID,
+      "articles",
+      "article_id"
+    );
 
     const newComment = await addCommentToArticle(articleID, username, body);
     res.status(201).send({ newComment });
@@ -93,7 +125,11 @@ exports.postCommentToArticle = async (req, res, next) => {
 exports.deleteComment = async (req, res, next) => {
   try {
     const commentID = req.params.comment_id;
-    const commentCheck = await checkSomethingExists(commentID, "comments");
+    const commentCheck = await checkSomethingExists(
+      commentID,
+      "comments",
+      "comment_id"
+    );
 
     const deletedComment = await removeComment(commentID);
     res.status(204).send();
