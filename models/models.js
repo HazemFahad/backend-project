@@ -1,5 +1,7 @@
 const db = require("../db/connection");
 
+//////////////////////////// CHECK FUNCTION ////////////////////////////
+
 /* ***************CHECK ARTICLE EXISTS****************/
 
 exports.checkSomethingExists = async (id, parent, child) => {
@@ -19,12 +21,16 @@ exports.checkSomethingExists = async (id, parent, child) => {
   }
 };
 
+//////////////////////////// TOPICS ////////////////////////////
+
 /* ***************GET TOPICS****************/
 
 exports.getTopics = async () => {
   const results = await db.query("SELECT * FROM topics;");
   return results.rows;
 };
+
+//////////////////////////// ARTICLE ////////////////////////////
 
 /* ***************GET ARTICLE BY ID****************/
 
@@ -128,6 +134,8 @@ exports.updateVotes = async (articleID, voteNum) => {
   return result.rows[0];
 };
 
+//////////////////////////// USERS ////////////////////////////
+
 /* ***************GET USERS****************/
 
 exports.getAllUsers = async () => {
@@ -152,6 +160,8 @@ exports.fetchUsersByUsername = async (username) => {
 
   return result.rows[0];
 };
+
+//////////////////////////// COMMENTS ////////////////////////////
 
 /* ***************GET COMMENTS FOR EACH ARTICLE BY ID****************/
 
@@ -197,4 +207,18 @@ exports.removeComment = async (commentID) => {
   WHERE comment_id = $1
   `;
   const deleteResult = await db.query(deleteQuery, [commentID]);
+};
+
+/* ***************PATCH COMMENTS BY ID****************/
+
+exports.editComment = async (commentID, voteNum) => {
+  const commentQuery = `
+  UPDATE comments
+  SET votes = votes + $1  
+  WHERE comment_id = $2
+  RETURNING *
+  `;
+  const commentResult = await db.query(commentQuery, [voteNum, commentID]);
+
+  return commentResult.rows[0];
 };
