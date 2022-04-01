@@ -107,7 +107,6 @@ exports.deleteComment = async (req, res, next) => {
 exports.readFileAndSend = async (req, res, next) => {
   try {
     const data = await fs.readFile("./endpoints.json", "utf-8");
-    console.log(data);
     res.status(200).send(JSON.parse(data));
   } catch (err) {
     next(err);
