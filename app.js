@@ -1,7 +1,5 @@
 const express = require("express");
 
-// const fs = require("fs/promises");
-
 const {
   getTopics,
   getArticles,
@@ -10,13 +8,14 @@ const {
   getCommentsForArticle,
   postCommentToArticle,
   deleteComment,
+  readFileAndSend,
 } = require("./controllers/controllers");
 
 const app = express();
 
 app.use(express.json());
 
-app.get("/api");
+app.get("/api", readFileAndSend);
 
 app.get("/api/topics", getTopics);
 

@@ -3,6 +3,7 @@ const seed = require("../db/seeds/seed");
 const db = require("../db/connection");
 const request = require("supertest");
 const testData = require("../db/data/test-data/index");
+const fs = require("fs/promises");
 
 beforeEach(() => seed(testData));
 afterAll(() => db.end());
@@ -375,5 +376,22 @@ describe("DELETE /api/comments/:comment_id deletes comment from table and return
     expect(results.body.msg).toBe(
       "A comment with provided comment_ID does not exist"
     );
+  });
+});
+
+/* ***************GET API RETURNS ENDPOINTS ****************/
+
+describe("GET /api", () => {
+  test("returns 200 & object of all endpoints", async () => {
+    const results = await request(app).get("/api").expect(200);
+    const data = await fs.readFile("./endpoints.json", "utf-8");
+    expect(results.body).toEqual(JSON.parse(data));
+  });
+
+  test("returns 404 error if endpoint incorrectly inputted", async () => {
+    const results = await request(app).get("/apa").expect(404);
+    expect(results.body).toEqual({
+      msg: "Page not Found",
+    });
   });
 });
