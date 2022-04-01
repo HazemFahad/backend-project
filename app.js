@@ -1,16 +1,5 @@
 const express = require("express");
 
-const {
-  getTopics,
-  getArticles,
-  patchArticleById,
-  getUsernames,
-  getCommentsForArticle,
-  postCommentToArticle,
-  deleteComment,
-  readFileAndSend,
-} = require("./controllers/controllers");
-
 const apiRouter = require("./routers/apiRouter.js");
 
 const app = express();
