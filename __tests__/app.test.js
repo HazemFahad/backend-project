@@ -251,6 +251,112 @@ describe("GET /api/articles returns articles with correct queries applied ", () 
   });
 });
 
+/* ***************POST ARTICLES****************/
+
+describe("POST /api/articles returns new article added to articles table", () => {
+  test("returns new article added to articles table with existing username and topic", async () => {
+    const results = await request(app).post("/api/articles").expect(201).send({
+      title: "NEW Eight pug gifs that remind me of mitch",
+      topic: "mitch",
+      author: "icellusedkars",
+      body: "NEW some gifs",
+    });
+    expect(results.body.returnArticle.title).toBe(
+      "NEW Eight pug gifs that remind me of mitch"
+    );
+    expect(results.body.returnArticle.topic).toBe("mitch");
+    expect(results.body.returnArticle.author).toBe("icellusedkars");
+    expect(results.body.returnArticle.article_id).toBe(13);
+    expect(results.body.returnArticle.votes).toBe(0);
+    expect(results.body.returnArticle.comment_count).toBe(0);
+  });
+
+  test("returns new article added to articles table when username and topic are new", async () => {
+    const results = await request(app).post("/api/articles").expect(201).send({
+      title: "Hello there",
+      topic: "article smash",
+      author: "Jibin",
+      body: "I like cheese",
+    });
+    expect(results.body.returnArticle.title).toBe("Hello there");
+    expect(results.body.returnArticle.topic).toBe("article smash");
+    expect(results.body.returnArticle.author).toBe("Jibin");
+    expect(results.body.returnArticle.body).toBe("I like cheese");
+    expect(results.body.returnArticle.article_id).toBe(13);
+    expect(results.body.returnArticle.votes).toBe(0);
+    expect(results.body.returnArticle.comment_count).toBe(0);
+  });
+  test("adds user to users table if user is new", async () => {
+    const postArticleResults = await request(app)
+      .post("/api/articles")
+      .expect(201)
+      .send({
+        title: "Hello there",
+        topic: "article smash",
+        author: "Jibin",
+        body: "I like cheese",
+      });
+    const getNewlyCreatedUser = await request(app).get("/api/users/Jibin");
+    expect(getNewlyCreatedUser.body).toEqual({
+      user: { username: "Jibin", name: "Jibin", avatar_url: null },
+    });
+  });
+  test("adds topic to topics table if topic is new", async () => {
+    const postArticleResults = await request(app)
+      .post("/api/articles")
+      .expect(201)
+      .send({
+        title: "Hello there",
+        topic: "article smash",
+        author: "Jibin",
+        body: "I like cheese",
+      });
+    const getTopics = await request(app).get("/api/topics");
+    expect(getTopics.body.topics.slice(-1)).toEqual([
+      {
+        description: "article smash",
+        slug: "article smash",
+      },
+    ]);
+  });
+
+  test("returns 404 error if endpoint incorrectly inputted", async () => {
+    const results = await request(app)
+      .post("/api/articlesss")
+      .expect(404)
+      .send({
+        title: "Hello there",
+        topic: "article smash",
+        author: "Jibin",
+        body: "I like cheese",
+      });
+    expect(results.body).toEqual({
+      msg: "Page not Found",
+    });
+  });
+  test("returns 400 error if req.body contains incorrect keys ", async () => {
+    const results = await request(app).post("/api/articles").expect(400).send({
+      cheese: "Hello there",
+      no: "article smash",
+      author: "Jibin",
+      body: "I like cheese",
+    });
+    expect(results.body).toEqual({
+      msg: "Bad Request",
+    });
+  });
+  test("returns 400 error if req.body does not contains all required keys", async () => {
+    const results = await request(app).post("/api/articles").expect(400).send({
+      title: "Hello there",
+      topic: "article smash",
+      author: "Jibin",
+    });
+    expect(results.body).toEqual({
+      msg: "Bad Request",
+    });
+  });
+});
+
 //////////////////////////// USERS ////////////////////////////
 
 /* ***************GET USERS****************/
@@ -456,6 +562,34 @@ describe("PATCH /api/comments/:comment_id updates votes on given comment and ret
       .send({ inc_votes: 1 })
       .expect(400);
     expect(results.body.msg).toBe("Bad Request");
+  });
+  test("works for negative inc_votes number", async () => {
+    const results = await request(app)
+      .patch("/api/comments/1")
+      .send({ inc_votes: -1100 })
+      .expect(200);
+    expect(results.body.updatedComment.votes).toBe(-1084);
+  });
+  test("returns 400 if req.body is empty", async () => {
+    const results = await request(app)
+      .patch("/api/comments/1")
+      .send({})
+      .expect(400);
+    expect(results.body).toEqual({ msg: "Bad Request" });
+  });
+  test("returns 400 if req.body contains incorrect keys", async () => {
+    const results = await request(app)
+      .patch("/api/comments/1")
+      .send({ cheese: 204 })
+      .expect(400);
+    expect(results.body).toEqual({ msg: "Bad Request" });
+  });
+  test("returns 400 if inc_votes is not a number", async () => {
+    const results = await request(app)
+      .patch("/api/comments/1")
+      .send({ inc_votes: "cheese" })
+      .expect(400);
+    expect(results.body).toEqual({ msg: "Bad Request" });
   });
 });
 

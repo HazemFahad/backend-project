@@ -21,6 +21,35 @@ exports.checkSomethingExists = async (id, parent, child) => {
   }
 };
 
+exports.checkSomethingExistsNoReject = async (id, parent, child) => {
+  const query = `
+    SELECT *
+    FROM ${parent} 
+    WHERE ${child} = $1
+    `;
+
+  const result = await db.query(query, [id]);
+
+  if (result.rows.length === 0) {
+    return true;
+  }
+  return false;
+};
+
+exports.addNewThing = async (
+  table,
+  col1Name,
+  thingToAdd1,
+  col2Name,
+  thingToAdd2
+) => {
+  const Value = [thingToAdd1, thingToAdd2];
+  const Update = `  
+  INSERT INTO ${table} (${col1Name}, ${col2Name}) 
+  VALUES ($1, $2);`;
+  const Result = await db.query(Update, Value);
+};
+
 //////////////////////////// TOPICS ////////////////////////////
 
 /* ***************GET TOPICS****************/
@@ -134,6 +163,21 @@ exports.updateVotes = async (articleID, voteNum) => {
   return result.rows[0];
 };
 
+/* ***************POST ARTICLE****************/
+
+exports.addArticle = async (title, topic, author, body, votes = 0) => {
+  const articleQuery = `
+  INSERT INTO articles (title, topic, author, body, votes) 
+  VALUES ($1, $2, $3, $4, $5)
+  RETURNING *;
+  `;
+  const articleValue = [title, topic, author, body, votes];
+
+  const commentResult = await db.query(articleQuery, articleValue);
+
+  return commentResult.rows[0].article_id;
+};
+
 //////////////////////////// USERS ////////////////////////////
 
 /* ***************GET USERS****************/
@@ -180,12 +224,6 @@ exports.fetchCommentsForArticle = async (articleID) => {
 /* ***************POST COMMENTS FOR EACH ARTICLE BY ID****************/
 
 exports.addCommentToArticle = async (articleID, username, body) => {
-  const userValue = [username, username];
-  const userUpdate = `  
-  INSERT INTO users (name, username) 
-  VALUES ($1, $2);`;
-  const userResult = await db.query(userUpdate, userValue);
-
   const commentValue = [body, articleID, username, 0];
   const commentUpdate = `
   INSERT INTO comments (body, article_id, author, votes) 
