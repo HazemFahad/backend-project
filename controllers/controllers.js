@@ -8,9 +8,12 @@ const {
   fetchCommentsForArticle,
   addCommentToArticle,
   checkSomethingExists,
+  checkSomethingExistsNoReject,
   removeComment,
   fetchUsersByUsername,
   editComment,
+  addNewThing,
+  addArticle,
 } = require("../models/models");
 
 //////////////////////////// TOPICS ////////////////////////////
@@ -60,6 +63,53 @@ exports.patchArticleById = async (req, res, next) => {
     const article = await updateVotes(articleID, voteNum);
     res.status(200).send({ article });
   } catch (err) {
+    next(err);
+  }
+};
+
+/* ***************POST ARTICLE****************/
+
+exports.postArticle = async (req, res, next) => {
+  try {
+    const { body, author, title, topic } = req.body;
+
+    const userCheck = await checkSomethingExistsNoReject(
+      author,
+      "users",
+      "username"
+    );
+
+    if (userCheck) {
+      const addUser = await addNewThing(
+        "users",
+        "name",
+        author,
+        "username",
+        author
+      );
+    }
+
+    const topicCheck = await checkSomethingExistsNoReject(
+      topic,
+      "topics",
+      "slug"
+    );
+
+    if (topicCheck) {
+      const addTopic = await addNewThing(
+        "topics",
+        "description",
+        topic,
+        "slug",
+        topic
+      );
+    }
+
+    const newArticle = await addArticle(title, topic, author, body);
+    const returnArticle = await fetchArticles(newArticle);
+    res.status(201).send({ returnArticle });
+  } catch (err) {
+    console.log(err);
     next(err);
   }
 };
@@ -121,6 +171,14 @@ exports.postCommentToArticle = async (req, res, next) => {
       articleID,
       "articles",
       "article_id"
+    );
+
+    const addUser = await addNewThing(
+      "users",
+      "name",
+      username,
+      "username",
+      username
     );
 
     const newComment = await addCommentToArticle(articleID, username, body);
