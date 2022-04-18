@@ -261,14 +261,14 @@ describe("POST /api/articles returns new article added to articles table", () =>
       author: "icellusedkars",
       body: "NEW some gifs",
     });
-    expect(results.body.returnArticle.title).toBe(
+    expect(results.body.article.title).toBe(
       "NEW Eight pug gifs that remind me of mitch"
     );
-    expect(results.body.returnArticle.topic).toBe("mitch");
-    expect(results.body.returnArticle.author).toBe("icellusedkars");
-    expect(results.body.returnArticle.article_id).toBe(13);
-    expect(results.body.returnArticle.votes).toBe(0);
-    expect(results.body.returnArticle.comment_count).toBe(0);
+    expect(results.body.article.topic).toBe("mitch");
+    expect(results.body.article.author).toBe("icellusedkars");
+    expect(results.body.article.article_id).toBe(13);
+    expect(results.body.article.votes).toBe(0);
+    expect(results.body.article.comment_count).toBe(0);
   });
 
   test("returns new article added to articles table when username and topic are new", async () => {
@@ -278,13 +278,13 @@ describe("POST /api/articles returns new article added to articles table", () =>
       author: "Jibin",
       body: "I like cheese",
     });
-    expect(results.body.returnArticle.title).toBe("Hello there");
-    expect(results.body.returnArticle.topic).toBe("article smash");
-    expect(results.body.returnArticle.author).toBe("Jibin");
-    expect(results.body.returnArticle.body).toBe("I like cheese");
-    expect(results.body.returnArticle.article_id).toBe(13);
-    expect(results.body.returnArticle.votes).toBe(0);
-    expect(results.body.returnArticle.comment_count).toBe(0);
+    expect(results.body.article.title).toBe("Hello there");
+    expect(results.body.article.topic).toBe("article smash");
+    expect(results.body.article.author).toBe("Jibin");
+    expect(results.body.article.body).toBe("I like cheese");
+    expect(results.body.article.article_id).toBe(13);
+    expect(results.body.article.votes).toBe(0);
+    expect(results.body.article.comment_count).toBe(0);
   });
   test("adds user to users table if user is new", async () => {
     const postArticleResults = await request(app)
@@ -362,7 +362,7 @@ describe("POST /api/articles returns new article added to articles table", () =>
 /* ***************GET USERS****************/
 
 describe("GET /api/users", () => {
-  test("endpoint returns array of topics with both description and slug", async () => {
+  test("endpoint returns array of users", async () => {
     const results = await request(app).get("/api/users").expect(200);
     expect(results.body).toEqual({
       users: [
@@ -384,8 +384,8 @@ describe("GET /api/users", () => {
 
 /* ***************GET USERS BY USERNAME****************/
 
-describe("GET /api/users", () => {
-  test("endpoint returns array of topics with both description and slug", async () => {
+describe("GET /api/users/:username", () => {
+  test("endpoint returns a single user by username param", async () => {
     const results = await request(app)
       .get("/api/users/icellusedkars")
       .expect(200);

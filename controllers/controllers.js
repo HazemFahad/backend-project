@@ -107,7 +107,7 @@ exports.postArticle = async (req, res, next) => {
 
     const newArticle = await addArticle(title, topic, author, body);
     const returnArticle = await fetchArticles(newArticle);
-    res.status(201).send({ returnArticle });
+    res.status(201).send({ article: returnArticle });
   } catch (err) {
     console.log(err);
     next(err);
