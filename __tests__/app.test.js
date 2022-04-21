@@ -478,9 +478,9 @@ describe("POST /api/articles/:article_id/comments returns new comment added to c
     const results = await request(app)
       .post("/api/articles/2/comments")
       .expect(201)
-      .send({ username: "Hazem", body: "NC 4 Life" });
+      .send({ username: "butter_bridge", body: "NC 4 Life" });
 
-    expect(results.body.newComment.author).toBe("Hazem");
+    expect(results.body.newComment.author).toBe("butter_bridge");
     expect(results.body.newComment.body).toBe("NC 4 Life");
     expect(results.body.newComment.article_id).toBe(2);
     expect(results.body.newComment.comment_id).toBe(19);

@@ -180,7 +180,7 @@ exports.addArticle = async (title, topic, author, body, votes = 0) => {
 
 //////////////////////////// USERS ////////////////////////////
 
-/* ***************GET USERS****************/
+/* ***************GET USERSNAME****************/
 
 exports.getAllUsers = async () => {
   const queryString = `

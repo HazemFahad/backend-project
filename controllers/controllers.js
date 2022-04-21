@@ -109,7 +109,6 @@ exports.postArticle = async (req, res, next) => {
     const returnArticle = await fetchArticles(newArticle);
     res.status(201).send({ article: returnArticle });
   } catch (err) {
-    console.log(err);
     next(err);
   }
 };
@@ -173,13 +172,13 @@ exports.postCommentToArticle = async (req, res, next) => {
       "article_id"
     );
 
-    const addUser = await addNewThing(
-      "users",
-      "name",
-      username,
-      "username",
-      username
-    );
+    // const addUser = await addNewThing(
+    //   "users",
+    //   "name",
+    //   username,
+    //   "username",
+    //   username
+    // );
 
     const newComment = await addCommentToArticle(articleID, username, body);
     res.status(201).send({ newComment });
