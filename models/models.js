@@ -205,6 +205,18 @@ exports.fetchUsersByUsername = async (username) => {
   return result.rows[0];
 };
 
+/* ***************GET FULL USERS ****************/
+
+exports.getFullUsers = async () => {
+  const queryString = `
+  SELECT * FROM users;
+   `;
+
+  const result = await db.query(queryString);
+
+  return result.rows;
+};
+
 //////////////////////////// COMMENTS ////////////////////////////
 
 /* ***************GET COMMENTS FOR EACH ARTICLE BY ID****************/

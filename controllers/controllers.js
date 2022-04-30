@@ -14,6 +14,7 @@ const {
   editComment,
   addNewThing,
   addArticle,
+  getFullUsers,
 } = require("../models/models");
 
 //////////////////////////// TOPICS ////////////////////////////
@@ -134,6 +135,17 @@ exports.getUsersByUsername = async (req, res, next) => {
     const userCheck = await checkSomethingExists(username, "users", "username");
     const user = await fetchUsersByUsername(username);
     res.status(200).send({ user });
+  } catch (err) {
+    next(err);
+  }
+};
+
+/* ***************GET FULL USERS ****************/
+
+exports.getFullUserData = async (req, res, next) => {
+  try {
+    const users = await getFullUsers();
+    res.status(200).send({ users });
   } catch (err) {
     next(err);
   }

@@ -286,21 +286,7 @@ describe("POST /api/articles returns new article added to articles table", () =>
     expect(results.body.article.votes).toBe(0);
     expect(results.body.article.comment_count).toBe(0);
   });
-  test("adds user to users table if user is new", async () => {
-    const postArticleResults = await request(app)
-      .post("/api/articles")
-      .expect(201)
-      .send({
-        title: "Hello there",
-        topic: "article smash",
-        author: "Jibin",
-        body: "I like cheese",
-      });
-    const getNewlyCreatedUser = await request(app).get("/api/users/Jibin");
-    expect(getNewlyCreatedUser.body).toEqual({
-      user: { username: "Jibin", name: "Jibin", avatar_url: null },
-    });
-  });
+
   test("adds topic to topics table if topic is new", async () => {
     const postArticleResults = await request(app)
       .post("/api/articles")
@@ -382,12 +368,55 @@ describe("GET /api/users", () => {
   });
 });
 
+/* ***************GET FULL USERS ****************/
+
+describe("GET /api/fullusers", () => {
+  test("endpoint returns array of full user information", async () => {
+    const results = await request(app).get("/api/users/fullusers").expect(200);
+    expect(results.body).toEqual({
+      users: [
+        {
+          username: "butter_bridge",
+          name: "jonny",
+          avatar_url:
+            "https://www.healthytherapies.com/wp-content/uploads/2016/06/Lime3.jpg",
+        },
+        {
+          username: "icellusedkars",
+          name: "sam",
+          avatar_url:
+            "https://avatars2.githubusercontent.com/u/24604688?s=460&v=4",
+        },
+        {
+          username: "rogersop",
+          name: "paul",
+          avatar_url:
+            "https://avatars2.githubusercontent.com/u/24394918?s=400&v=4",
+        },
+        {
+          username: "lurker",
+          name: "do_nothing",
+          avatar_url:
+            "https://www.golenbock.com/wp-content/uploads/2015/01/placeholder-user.png",
+        },
+      ],
+    });
+  });
+
+  test("returns 404 error if endpoint incorrectly inputted", async () => {
+    const results = await request(app).get("/api/users/fullUsirs").expect(404);
+    expect(results.body).toEqual({
+      msg: "Page not Found",
+    });
+  });
+});
+
 /* ***************GET USERS BY USERNAME****************/
 
-describe("GET /api/users/:username", () => {
+describe("GET /api/users/fullusers/:username", () => {
   test("endpoint returns a single user by username param", async () => {
     const results = await request(app)
-      .get("/api/users/icellusedkars")
+      .get("/api/users/fullusers/icellusedkars")
       .expect(200);
     expect(results.body).toEqual({
       user: {
@@ -401,7 +430,7 @@ describe("GET /api/users/:username", () => {
 
   test("returns 404 error if username does not exist", async () => {
     const results = await request(app)
-      .get("/api/users/cheesemuffin")
+      .get("/api/users/fullusers/cheesemuffin")
       .expect(404);
     expect(results.body).toEqual({
       msg: "A username with provided ID does not exist",
@@ -409,7 +438,7 @@ describe("GET /api/users/:username", () => {
   });
   test("returns 404 error if endpoint incorrectly inputted", async () => {
     const results = await request(app)
-      .get("/api/usirs/icellusedkars")
+      .get("/api/usirs/fullusers/icellusedkars")
       .expect(404);
     expect(results.body).toEqual({
       msg: "Page not Found",
