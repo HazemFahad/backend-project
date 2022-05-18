@@ -2,7 +2,7 @@
 
 ## Notes on env files:
 
-Developer must add an .env.development (PGDATABASE=nc_news) file and a .env.test file (PGDATABASE=nc_news_test) to BE-NC-NEWS folder in order to successfully connect to the two databases locally.
+Developer must add an <code>.env.development</code> (PGDATABASE=nc_news) file and a <code>.env.test</code> file (PGDATABASE=nc_news_test) to BE-NC-NEWS folder in order to successfully connect to the two databases locally.
 
 ## What version of (Node.js) and (Postgresql) is required?
 
@@ -37,10 +37,10 @@ DELETE /api/comments/:comment_id
 1- Copy This Link : https://github.com/squarezy/backend-project
 
 2- In the Terminal use this command to clone it locally to the directory of your choice:
-(Git Clone https://github.com/squarezy/backend-project)
+<code>git clone https://github.com/squarezy/backend-project</code>
 
 3- After cloning successfully - Use this command to open Project:
-(code backend-project/)
+<code>code backend-project/</code>
 
 ## What to do after cloning?
 
@@ -49,26 +49,26 @@ DELETE /api/comments/:comment_id
 
 2- Create two (.env) Files:
 
-The first is (.env.development) and inside it write the following code: (Pgdatabase=nc_news)
+The first is <code>.env.development</code> and inside it write the following code: <code>Pgdatabase=nc_news</code>
 
-The second is (.env.development) and inside it write the following code: (Pgdatabase=nc_news_test)
+The second is <code>.env.development</code> and inside it write the following code: <code>Pgdatabase=nc_news_test</code>
 
 3- Run the following command in the terminal to establish a connection to (Postgresql):
 
-(sudo service postgresql start)
+<code>sudo service postgresql start</code>
 
-4- Run the following command in the terminal (npm run setup-dbs)
+4- Run the following command in the terminal <code>npm run setup-dbs</code>
 
 5- Run the following command in the terminal to test the app
-(npm t app.test.js)
+<code>npm t app.test.js</code>
 
 6- If you wanted to run the app in your local host:
 
-Inside the (listen.js) file:
+Inside the <code>listen.js</code> file:
 
-Replace line 3 with this ( const {port=9090} = process.env; )
+Replace line 3 with this <code> const {port=9090} = process.env; </code>
 
-Then to run the server, run this command (npm start)
+Then to run the server, run this command <code>npm start</code>
 
 7- In your browser set the url to: ( http://localhost:9090/ )
 
