@@ -19,18 +19,18 @@ https://jibinandshwey.herokuapp.com/api/
 
 ## What Endpoints are available?
 
-GET /api
-GET /api/topics
-GET /api/articles
-GET /api/articles/:article_id
-GET /api/users
-GET /api/users/:username
-GET /api/articles/:article_id/comments
-PATCH /api/articles/:article_id
-POST /api/articles
-POST /api/articles/:article_id/comments
-PATCH /api/comments/:comment_id
-DELETE /api/comments/:comment_id
+- GET /api
+- GET /api/topics
+- GET /api/articles
+- GET /api/articles/:article_id
+- GET /api/users
+- GET /api/users/:username
+- GET /api/articles/:article_id/comments
+- PATCH /api/articles/:article_id
+- POST /api/articles
+- POST /api/articles/:article_id/comments
+- PATCH /api/comments/:comment_id
+- DELETE /api/comments/:comment_id
 
 ## How to Clone this backend Repo From Github?
 
