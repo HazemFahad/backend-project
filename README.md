@@ -34,10 +34,10 @@ https://jibinandshwey.herokuapp.com/api/
 
 ## How to Clone this backend Repo From Github?
 
-1- Copy This Link : https://github.com/squarezy/backend-project
+1- Copy This Link : https://github.com/hazemfahad/backend-project
 
 2- In the Terminal use this command to clone it locally to the directory of your choice:
-<code>git clone https://github.com/squarezy/backend-project</code>
+<code>git clone https://github.com/hazemfahad/backend-project</code>
 
 3- After cloning successfully - Use this command to open Project:
 <code>code backend-project/</code>
